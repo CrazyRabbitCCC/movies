@@ -23,7 +23,7 @@ public class ApiHelper {
     public ApiHelper(iMainListener main){
         this.main=main;
     }
-    public static final String API_KEy="[my key]";
+    public static final String API_KEy="[]";
 
     public void loadData(int type) {
         main.clearData();
