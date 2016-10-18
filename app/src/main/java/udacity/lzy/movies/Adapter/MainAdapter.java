@@ -6,7 +6,6 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import com.squareup.picasso.Picasso;
 
@@ -33,12 +32,14 @@ public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
         mContext=context;
         this.list = new ArrayList<>();
         DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
-        width = dm.widthPixels;
+        width = (dm.widthPixels-32)/2;
     }
 
     public MainAdapter(Context context,List<Map<String,Object>> list) {
         mContext=context;
         this.list = list;
+        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
+        width = (dm.widthPixels-32)/2;
     }
 
     public void add(Map<String,Object> map){
@@ -69,16 +70,19 @@ public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
         Map<String, Object> map = list.get(position);
         Picasso.with(mContext).load(BaseUri+map.get("poster_path").toString()).into(holder.image);
 
-        ViewTreeObserver vto2 = holder.itemView.getViewTreeObserver();
-        vto2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                holder.itemView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
-                params.height=holder.itemView.getWidth()*40/27;
-                holder.itemView.setLayoutParams(params);
-            }
-        });
+        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+        params.height=width*38/27;
+        holder.itemView.setLayoutParams(params);
+//        ViewTreeObserver vto2 = holder.itemView.getViewTreeObserver();
+//        vto2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                holder.itemView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//                ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+//                params.height=holder.itemView.getWidth()*40/27;
+//                holder.itemView.setLayoutParams(params);
+//            }
+//        });
         holder.text.setText(map.get("title").toString());
     }
 

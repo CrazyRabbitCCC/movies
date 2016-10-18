@@ -23,13 +23,25 @@ public class ApiHelper {
     public ApiHelper(iMainListener main){
         this.main=main;
     }
-    public static final String API_KEy="[my_key]";
+    public static final String API_KEy="[my key]";
 
-    public  void getPopular(String key) {
+    public void loadData(int type) {
+        main.clearData();
+        switch (type){
+            case 0:
+                getPopular(ApiHelper.API_KEy);
+                break;
+            case 1:
+                getTop(ApiHelper.API_KEy);
+                break;
+        }
+    }
+
+    private  void getPopular(String key) {
         MovieApi movieApi= createRetrofitService(MovieApi.class);
         dealData(movieApi.getPopular(key));
     }
-    public  void getTop(String key) {
+    private  void getTop(String key) {
         MovieApi movieApi = createRetrofitService(MovieApi.class);
         dealData(movieApi.getTop(key));
     }
