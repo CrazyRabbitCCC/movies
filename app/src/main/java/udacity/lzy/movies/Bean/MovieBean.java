@@ -1,35 +1,30 @@
 package udacity.lzy.movies.Bean;
 // @author: lzy  time: 2016/10/18.
 
+import android.content.ContentValues;
+import android.text.TextUtils;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-public  class MovieBean {
-    final String SQL_CREATE_MOVIE = "CREATE TABLE " + MovieBean.TABLE_NAME + "(" +
-            MovieBean.RELEASE_DATE + " TEXT NOT NULL," +
-            MovieBean.ORIGINAL_TITLE + " TEXT NOT NULL," +
-            MovieBean.ORIGINAL_LANGUAGE + " TEXT NOT NULL," +
-            MovieBean.TITLE + " TEXT NOT NULL," +
-            MovieBean.BACKDROP_PATH + " TEXT NOT NULL," +
-            MovieBean.POPULARITY + " TEXT NOT NULL," +
-            MovieBean.VOTE_COUNT + " TEXT NOT NULL," +
-            MovieBean.VIDEO + " BOOLEAN DEFAULT FALSE," +
-            MovieBean.VOTE_AVERAGE + " TEXT NOT NULL," +
-            MovieBean.GENRE_IDS + " TEXT NOT NULL);";
+public  class MovieBean implements Serializable {
+
     public static final String TABLE_NAME="movie_table";
-    public static final String POSTER_PATH="poster_path TEXT";
-    public static final String ADULT="adult BOOLEAN DEFAULT FALSE";
-    public static final String OVERVIEW="overview TEXT";
-    public static final String RELEASE_DATE="release_date  TEXT";
-    public static final String ID="movie_id INTEGER";
-    public static final String ORIGINAL_TITLE="original_title  TEXT";
-    public static final String ORIGINAL_LANGUAGE="original_language  TEXT";
-    public static final String TITLE="title  TEXT";
-    public static final String BACKDROP_PATH="backdrop_path  TEXT";
-    public static final String POPULARITY="popularity  TEXT";
-    public static final String VOTE_COUNT="vote_count INTEGER";
-    public static final String VIDEO="video BOOLEAN DEFAULT FALSE";
-    public static final String VOTE_AVERAGE="vote_average TEXT";
-    public static final String GENRE_IDS="genre_ids  TEXT";
+    public static final String POSTER_PATH="poster_path";
+    public static final String ADULT="adult";
+    public static final String OVERVIEW="overview";
+    public static final String RELEASE_DATE="release_date";
+    public static final String ID="id";
+    public static final String ORIGINAL_TITLE="original_title";
+    public static final String ORIGINAL_LANGUAGE="original_language";
+    public static final String TITLE="title";
+    public static final String BACKDROP_PATH="backdrop_path";
+    public static final String POPULARITY="popularity";
+    public static final String VOTE_COUNT="vote_count";
+    public static final String VIDEO="video";
+    public static final String VOTE_AVERAGE="vote_average";
+    public static final String GENRE_IDS="genre_ids";
 
     private String poster_path;
     private boolean adult;
@@ -154,7 +149,49 @@ public  class MovieBean {
         return genre_ids;
     }
 
-    public void setGenre_ids(List<Integer> genre_ids) {
-        this.genre_ids = genre_ids;
+    public String getGenreIds(){
+        String s="";
+        for (Integer id :
+                genre_ids) {
+            s += id + ",";
+        }
+        if (!TextUtils.isEmpty(s))
+            s=s.substring(0,s.length()-1);
+        return s;
     }
+
+    public void setGenre_ids(List<Integer> genre_id) {this.genre_ids = genre_id;}
+    public void setGenre_ids(String genre_id) {
+        String[] split = genre_id.split(",");
+        List<Integer> genre_ids=new ArrayList<>();
+        for (String id : split) {
+            try {
+                genre_ids.add(Integer.parseInt(id));
+            } catch (Exception e) {
+
+            }
+        }
+        this.genre_ids=genre_ids;
+
+    }
+
+    public ContentValues getContentValues(){
+        ContentValues values = new ContentValues();
+        values.put(MovieBean.ID, getId());
+        values.put(MovieBean.POSTER_PATH, getPoster_path());
+        values.put(MovieBean.ADULT, adult);
+        values.put(MovieBean.OVERVIEW,getOverview());
+        values.put(MovieBean.RELEASE_DATE,getRelease_date());
+        values.put(MovieBean.ORIGINAL_TITLE, getOriginal_title());
+        values.put(MovieBean.ORIGINAL_LANGUAGE, getOriginal_language());
+        values.put(MovieBean.TITLE, getTitle());
+        values.put(MovieBean.BACKDROP_PATH,getBackdrop_path());
+        values.put(MovieBean.POPULARITY, getPopularity());
+        values.put(MovieBean.VOTE_COUNT, getVote_average());
+        values.put(MovieBean.VIDEO, isVideo());
+        values.put(MovieBean.VOTE_AVERAGE, getVote_average());
+        values.put(MovieBean.GENRE_IDS,getGenreIds());
+        return values;
+    }
+
 }

@@ -7,8 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import udacity.lzy.movies.Bean.MovieBean;
-import udacity.lzy.movies.Bean.ReviewBean;
-import udacity.lzy.movies.Bean.VideoBean;
 
 public class MovieDbHelper extends SQLiteOpenHelper {
 
@@ -31,43 +29,42 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         final String SQL_CREATE_MOVIE = "CREATE TABLE " + MovieBean.TABLE_NAME + "(" +
                 MovieBean.ID + " PRIMARY KEY," +
-                MovieBean.POSTER_PATH + " NOT NULL," +
-                MovieBean.ADULT + "," +
-                MovieBean.OVERVIEW + " NOT NULL," +
-                MovieBean.RELEASE_DATE + " NOT NULL," +
-                MovieBean.ORIGINAL_TITLE + " NOT NULL," +
-                MovieBean.ORIGINAL_LANGUAGE + " NOT NULL," +
-                MovieBean.TITLE + " NOT NULL," +
-                MovieBean.BACKDROP_PATH + " NOT NULL," +
-                MovieBean.POPULARITY + " NOT NULL," +
-                MovieBean.VOTE_COUNT + " NOT NULL," +
-                MovieBean.VIDEO + "," +
-                MovieBean.VOTE_AVERAGE + " NOT NULL," +
-                MovieBean.GENRE_IDS + " NOT NULL);";
-        final String SQL_CREATE_REVIEW = "CREATE TABLE "+ ReviewBean.TABLE_NAME+ " ("+
-                ReviewBean. ID+" PRIMARY KEY,"+
-                ReviewBean. AUTHOR+" NOT NULL,"+
-                ReviewBean. CONTENT+" NOT NULL,"+
-                ReviewBean. URL+" NOT NULL,"+
-                ReviewBean.MOVIE_ID+"NOT NULL);";
-
-        final String SQL_CREATE_VIDEO = "CREATE TABLE " +VideoBean.TABLE_NAME+"("+
-        VideoBean.ID+" PRIMARY KEY,"+
-        VideoBean.ISO_639_1+" NOT NULL,"+
-        VideoBean.ISO_3166_1+" NOT NULL,"+
-        VideoBean.KEY+" NOT NULL,"+
-        VideoBean.NAME+" NOT NULL,"+
-        VideoBean.SITE+" NOT NULL,"+
-        VideoBean.SIZE+" NOT NULL,"+
-        VideoBean.TYPE+" NOT NULL,"+
-        VideoBean.MOVIE_ID+" NOT NULL);";
+                MovieBean.POSTER_PATH + " TEXT NOT NULL," +
+                MovieBean.ADULT + " BOOLEAN DEFAULT FALSE," +
+                MovieBean.OVERVIEW + " TEXT NOT NULL," +
+                MovieBean.RELEASE_DATE + " TEXT NOT NULL," +
+                MovieBean.ORIGINAL_TITLE + " TEXT NOT NULL," +
+                MovieBean.ORIGINAL_LANGUAGE + " TEXT NOT NULL," +
+                MovieBean.TITLE + " TEXT NOT NULL," +
+                MovieBean.BACKDROP_PATH + " TEXT NOT NULL," +
+                MovieBean.POPULARITY + " TEXT NOT NULL," +
+                MovieBean.VOTE_COUNT + " INTEGER NOT NULL," +
+                MovieBean.VIDEO + " BOOLEAN DEFAULT FALSE," +
+                MovieBean.VOTE_AVERAGE + " TEXT NOT NULL," +
+                MovieBean.GENRE_IDS + " TEXT NOT NULL);";
+//        final String SQL_CREATE_REVIEW = "CREATE TABLE "+ ReviewBean.TABLE_NAME+ " ("+
+//                ReviewBean. ID+" PRIMARY KEY,"+
+//                ReviewBean. AUTHOR+" NOT NULL,"+
+//                ReviewBean. CONTENT+" NOT NULL,"+
+//                ReviewBean. URL+" NOT NULL,"+
+//                ReviewBean.MOVIE_ID+"NOT NULL);";
+//
+//        final String SQL_CREATE_VIDEO = "CREATE TABLE " +VideoBean.TABLE_NAME+"("+
+//        VideoBean.ID+" PRIMARY KEY,"+
+//        VideoBean.ISO_639_1+" NOT NULL,"+
+//        VideoBean.ISO_3166_1+" NOT NULL,"+
+//        VideoBean.KEY+" NOT NULL,"+
+//        VideoBean.NAME+" NOT NULL,"+
+//        VideoBean.SITE+" NOT NULL,"+
+//        VideoBean.SIZE+" NOT NULL,"+
+//        VideoBean.TYPE+" NOT NULL,"+
+//        VideoBean.MOVIE_ID+" NOT NULL);";
 
         db.execSQL(SQL_CREATE_MOVIE);
-        db.execSQL(SQL_CREATE_REVIEW);
-        db.execSQL(SQL_CREATE_VIDEO);
+//        db.execSQL(SQL_CREATE_REVIEW);
+//        db.execSQL(SQL_CREATE_VIDEO);
 
 
     }
@@ -76,8 +73,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         db.execSQL("DROP TABLE IF EXISTS " + MovieBean.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ReviewBean.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + VideoBean.TABLE_NAME);
+//        db.execSQL("DROP TABLE IF EXISTS " + ReviewBean.TABLE_NAME);
+//        db.execSQL("DROP TABLE IF EXISTS " + VideoBean.TABLE_NAME);
         onCreate(db);
     }
 }

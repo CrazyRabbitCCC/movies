@@ -63,12 +63,26 @@
                         tools:text="vote_average"
                         />
                 </TableRow>
-                <Switch
-                    android:visibility="gone"
-                    android:id="@+id/collect"
-                    android:layout_width="wrap_content"
-                    android:gravity="end|center_vertical"
-                    android:text="@string/not_collected"/>
+
+                <TableRow
+                    android:id="@+id/collect_row">
+                    <ImageView
+                        android:id="@+id/collect"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:scaleX="0.5"
+                        android:scaleY="0.5"
+                        android:background="@android:drawable/btn_star_big_off"/>
+                    <TextView
+                        android:visibility="visible"
+                        android:id="@+id/collect_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="@string/not_collected"/>
+
+                </TableRow>
+
             </TableLayout>
         </LinearLayout>
 

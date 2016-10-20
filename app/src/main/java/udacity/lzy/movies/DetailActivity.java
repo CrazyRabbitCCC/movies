@@ -1,5 +1,6 @@
 package udacity.lzy.movies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -40,8 +41,10 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
     private int totalPage=1;
     private ApiHelper apiHelper;
     private DetailAdapter detailAdapter;
-    private boolean isLoading=false;
+    private boolean isLoading=true;
     private MovieBean movie;
+    private boolean isCollecting=true;
+    private boolean collected=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,20 +57,34 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
 
     private void initView() {
         apiHelper = new ApiHelper(this);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+        fab.setImageResource(android.R.drawable.btn_star_big_off);
+        fab.setOnClickListener(view -> {
+            if (isCollecting){
+                if (collected)
+                    Snackbar.make(view, "正在取消收藏", Snackbar.LENGTH_LONG).show();
+                else
+                    Snackbar.make(view, "正在收藏", Snackbar.LENGTH_LONG).show();
+                return;
+            }
+            isCollecting=true;
+            if (collected)
+                apiHelper.deleteCollectMovies(movie.getId());
+            else
+                apiHelper.insertCollectMovies(movie);
+        });
         Intent intent = getIntent();
 
-        movie = new MovieBean();
-        int id = intent.getIntExtra("id", 0);
-        movie.setId(intent.getIntExtra("id", 0));
-        movie.setPoster_path(intent.getStringExtra("poster_path"));
-        movie.setOverview(intent.getStringExtra("overview"));
-        movie.setTitle(intent.getStringExtra("title"));
-        movie.setRelease_date(intent.getStringExtra("release_date"));
-        movie.setVote_average(intent.getDoubleExtra("vote_average", 0));
+        Bundle bundle = intent.getExtras();
+        movie = (MovieBean) bundle.getSerializable("movie");
+//        int id = intent.getIntExtra("id", 0);
+//        movie.setId(intent.getIntExtra("id", 0));
+//        movie.setPoster_path(intent.getStringExtra("poster_path"));
+//        movie.setOverview(intent.getStringExtra("overview"));
+//        movie.setTitle(intent.getStringExtra("title"));
+//        movie.setRelease_date(intent.getStringExtra("release_date"));
+//        movie.setVote_average(intent.getDoubleExtra("vote_average", 0));
 
-        if (!TextUtils.isEmpty(movie.getTitle())) {
+        if (movie!=null&&!TextUtils.isEmpty(movie.getTitle())) {
 //            toolbar.setTitle(title_text);
             toolbarLayout.setTitle(movie.getTitle());
         }
@@ -98,8 +115,9 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
                 }
             }
         });
-        apiHelper.getVideos(id);
-        apiHelper.getReviews(id);
+        apiHelper.getVideos(movie.getId());
+        apiHelper.getReviews(movie.getId());
+        apiHelper.getCollectMovies(movie.getId());
     }
 
 
@@ -135,6 +153,22 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    @Override
+    public Context getActivity() {
+        return this;
+    }
+
+    @Override
+    public void setCollect(boolean flag) {
+        isCollecting=false;
+        collected=flag;
+        if (collected)
+            fab.setImageResource(android.R.drawable.btn_star_big_on);
+        else
+            fab.setImageResource(android.R.drawable.btn_star_big_off);
+
     }
 
     @Override

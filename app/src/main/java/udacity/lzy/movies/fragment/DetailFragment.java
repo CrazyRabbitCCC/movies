@@ -4,6 +4,7 @@ package udacity.lzy.movies.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,7 +36,8 @@ public class DetailFragment extends Fragment implements iMainListener {
     private int page=1;
     private int totalPage=1;
     private MovieBean movie;
-
+    private boolean isCollecting=true;
+    private boolean collected=false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +64,20 @@ public class DetailFragment extends Fragment implements iMainListener {
         apiHelper=new ApiHelper(this);
         detailAdapter = new DetailAdapter(getActivity(),new MovieBean());
         detailAdapter.setTwoPanel(true);
+        detailAdapter.setOnClickListener(view->{
+            if (isCollecting){
+                if (collected)
+                    Snackbar.make(view, "正在取消收藏", Snackbar.LENGTH_LONG).show();
+                else
+                    Snackbar.make(view, "正在收藏", Snackbar.LENGTH_LONG).show();
+                return;
+            }
+            isCollecting=true;
+            if (collected)
+                apiHelper.deleteCollectMovies(movie.getId());
+            else
+                apiHelper.insertCollectMovies(movie);
+        });
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(manager);
@@ -89,6 +105,7 @@ public class DetailFragment extends Fragment implements iMainListener {
         if (movie.getId()!=0)
         apiHelper.getVideos(movie.getId());
         apiHelper.getReviews(movie.getId());
+        apiHelper.getCollectMovies(movie.getId());
     }
 
     @Override
@@ -138,6 +155,13 @@ public class DetailFragment extends Fragment implements iMainListener {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    @Override
+    public void setCollect(boolean flag) {
+        isCollecting=false;
+        collected = flag;
+        detailAdapter.setSwitch(collected);
     }
 
     @Override

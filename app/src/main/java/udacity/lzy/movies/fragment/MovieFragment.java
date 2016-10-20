@@ -90,7 +90,7 @@ public class MovieFragment extends Fragment implements iMainListener {
         mainAdapter.setLongListener(longListener);
         apiHelper = new ApiHelper(this);
         rv.setAdapter(mainAdapter);
-        String[] spinnerStrings = new String[]{"最受欢迎", "评分最高"};
+        String[] spinnerStrings = new String[]{"最受欢迎", "评分最高","收藏"};
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, spinnerStrings);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
@@ -171,6 +171,7 @@ public class MovieFragment extends Fragment implements iMainListener {
                 progress.setVisibility(View.VISIBLE);
                 apiHelper.loadMovies(type,page);
             }else {
+                if (type!=2)
                 ShowToast("已经加载完所有电影");
             }
         } else {
@@ -186,6 +187,11 @@ public class MovieFragment extends Fragment implements iMainListener {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    @Override
+    public void setCollect(boolean flag) {
+
     }
 
     @Override

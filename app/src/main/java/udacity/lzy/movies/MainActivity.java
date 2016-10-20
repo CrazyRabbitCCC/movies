@@ -51,12 +51,15 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, DetailActivity.class);
 
                 if (map != null) {
-                    intent.putExtra("id", map.getId());
-                    intent.putExtra("poster_path", map.getPoster_path());
-                    intent.putExtra("overview", map.getOverview());
-                    intent.putExtra("title", map.getTitle());
-                    intent.putExtra("release_date", map.getRelease_date());
-                    intent.putExtra("vote_average", map.getVote_average());
+                    Bundle bundle=new Bundle();
+                    bundle.putSerializable("movie",map);
+                    intent.putExtras(bundle);
+//                    intent.putExtra("id", map.getId());
+//                    intent.putExtra("poster_path", map.getPoster_path());
+//                    intent.putExtra("overview", map.getOverview());
+//                    intent.putExtra("title", map.getTitle());
+//                    intent.putExtra("release_date", map.getRelease_date());
+//                    intent.putExtra("vote_average", map.getVote_average());
                 }
                 startActivity(intent);
             }

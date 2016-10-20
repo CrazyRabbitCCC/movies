@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Switch;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -37,6 +37,8 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailHolder> {
     private String baseUri = "http://image.tmdb.org/t/p/w500";
     private boolean twoPanel = false;
     private boolean isLoading=true;
+    private View.OnClickListener onClickListener;
+    private boolean switch_btn =true;
 
     public DetailAdapter(Context context, MovieBean movieDetail) {
         videos = new ArrayList<>();
@@ -74,12 +76,21 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailHolder> {
         notifyDataSetChanged();
     }
 
+    public void setOnClickListener(View.OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+    }
+
     public void setListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
     public void setLongListener(OnItemLongClickListener longListener) {
         this.longListener = longListener;
+    }
+
+    public void setSwitch(boolean flag){
+        switch_btn=flag;
+        notifyItemChanged(0);
     }
 
     @Override
@@ -91,6 +102,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailHolder> {
         }
         if (viewType == 4) {
             View footView = LayoutInflater.from(parent.getContext()).inflate(R.layout.detail_foot, parent, false);
+            return new DetailFoot(footView, listener, longListener);
         }
         return new DetailHolder(itemView, listener, longListener);
     }
@@ -101,9 +113,17 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailHolder> {
             if (holder instanceof DetailHeader) {
                 DetailHeader header = (DetailHeader) holder;
                 if (twoPanel) {
-                    header.collect.setVisibility(View.VISIBLE);
-                    header.collect.setOnClickListener( v->{
-                    });
+                    header.collect_row.setVisibility(View.VISIBLE);
+                    if (onClickListener!=null)
+                    header.collect.setOnClickListener(onClickListener);
+                    if (switch_btn) {
+                        header.collect.setImageResource(android.R.drawable.btn_star_big_on);
+                        header.collect_text.setText(R.string.collected);
+                    }
+                    else {
+                        header.collect.setImageResource(android.R.drawable.btn_star_big_off);
+                        header.collect_text.setText(R.string.not_collected);
+                    }
                 }
                 if (twoPanel && !TextUtils.isEmpty(detail.getPoster_path())) {
                     header.image.setVisibility(View.VISIBLE);
@@ -217,7 +237,11 @@ class DetailHeader extends DetailHolder {
     @Bind(R.id.overview)
     TextView overview;
     @Bind(R.id.collect)
-    Switch collect;
+    ImageView collect;
+    @Bind(R.id.collect_text)
+    TextView collect_text;
+    @Bind(R.id.collect_row)
+    TableRow collect_row;
 
     public DetailHeader(View itemView, OnItemClickListener listener, OnItemLongClickListener longListener) {
         super(itemView, listener, longListener);
