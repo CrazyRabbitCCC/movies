@@ -1,51 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="10dp"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="udacity.lzy.movies.DetailActivity"
-    tools:showIn="@layout/activity_detail">
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <ImageView
+                android:visibility="gone"
                 android:layout_width="135dp"
                 android:layout_height="200dp"
                 android:id="@+id/image"
-                android:background="#70cc"/>
+                android:background="@color/image_background"/>
             <TableLayout
                 android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center">
 
-                    <TextView
-                        android:textSize="18sp"
-                        android:paddingBottom="10dp"
-                        android:layout_width="match_parent"
-                        android:gravity="center"
-                        android:id="@+id/title"
-                        tools:text="title"
-                        />
+                <TextView
+                    android:textSize="18sp"
+                    android:paddingBottom="10dp"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:id="@+id/title"
+                    tools:text="title"
+                    />
                 <TableRow
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:paddingBottom="10dp">
                     <TextView
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:paddingRight="10dp"
                         android:text="@string/release_date"/>
                     <TextView
                         android:paddingLeft="10dp"
-                        android:layout_width="match_parent"
+                        android:layout_weight="1"
                         android:id="@+id/release_date"
                         tools:text="release_date"
                         />
@@ -55,29 +52,37 @@
                     android:layout_width="match_parent"
                     android:paddingBottom="10dp">
                     <TextView
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:paddingRight="10dp"
                         android:text="@string/vote_average"/>
                     <TextView
                         android:paddingLeft="10dp"
-                        android:layout_width="match_parent"
+                        android:layout_weight="1"
                         android:id="@+id/vote_average"
                         tools:text="vote_average"
                         />
                 </TableRow>
-
+                <Switch
+                    android:visibility="gone"
+                    android:id="@+id/collect"
+                    android:layout_width="wrap_content"
+                    android:gravity="end|center_vertical"
+                    android:text="@string/not_collected"/>
             </TableLayout>
         </LinearLayout>
 
         <TextView
+            android:id="@+id/message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/overview"/>
         <TextView
             android:id="@+id/overview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:padding="10dp"
             tools:text="overview"/>
 
-    </LinearLayout>
-
-</android.support.v4.widget.NestedScrollView>
+</LinearLayout>
+    <!--android.support.v4.widget.NestedScrollView-->

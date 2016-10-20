@@ -10,7 +10,7 @@
         android:maxHeight="200dp"
         android:layout_gravity="center"
         android:layout_margin="1dp"
-        android:background="#70cc"/>
+        android:background="@color/image_background"/>
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"

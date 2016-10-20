@@ -4,9 +4,6 @@ package udacity.lzy.movies.ApiService;
 
 import com.orhanobut.logger.Logger;
 
-import java.util.List;
-import java.util.Map;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -15,80 +12,109 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import udacity.lzy.movies.Bean.ApiBean;
+import udacity.lzy.movies.Bean.ReviewsResult;
+import udacity.lzy.movies.Bean.VideosResult;
 import udacity.lzy.movies.iMainListener;
 
 public class ApiHelper {
     private iMainListener main;
+    MovieApi movieApi;
+    int page = 0;
+    int totalPage = 0;
 
-    public ApiHelper(iMainListener main){
-        this.main=main;
+    public ApiHelper(iMainListener main) {
+        this.main = main;
+        movieApi = createRetrofitService(MovieApi.class);
     }
-    public static final String API_KEy="[]";
 
-    public void loadData(int type) {
+    public static final String API_KEY = "ba2d44e32a7d377c08a53c5e3f5d4ce4";
+
+    public void loadMovies(int type) {
         main.clearData();
-        switch (type){
+        loadMovies(type, 1);
+    }
+
+    public void loadMovies(int type, int page) {
+        switch (type) {
             case 0:
-                getPopular(ApiHelper.API_KEy);
+                dealMovies(movieApi.getPopular(page, API_KEY));
                 break;
             case 1:
-                getTop(ApiHelper.API_KEy);
+                dealMovies(movieApi.getTop(page, API_KEY));
                 break;
         }
     }
 
-    private  void getPopular(String key) {
-        MovieApi movieApi= createRetrofitService(MovieApi.class);
-        dealData(movieApi.getPopular(key));
-    }
-    private  void getTop(String key) {
-        MovieApi movieApi = createRetrofitService(MovieApi.class);
-        dealData(movieApi.getTop(key));
+    public void getVideos(int id) {
+        movieApi.getVideos(id, API_KEY)
+                .subscribeOn(Schedulers.io())
+                .map(VideosResult::getResults)
+                .flatMap(Observable::from)
+                .map(videoBean -> {
+                    videoBean.setMovie_id(id);
+                    return videoBean;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(video -> main.addData(video)
+                        , throwable -> Logger.d(throwable.getMessage()),
+                        () -> Logger.d("Success"));
     }
 
+    public void getReviews(int id) {
+        getReviews(id, 1);
+    }
 
-    private  void dealData(Observable<Map<String, Object>> observable){
+    public void getReviews(int id, int page) {
+        movieApi.getReviews(id, page, API_KEY)
+                .subscribeOn(Schedulers.io())
+                .map(result -> {
+                    main.setPage(result.getPage());
+                    main.setTotalPage(result.getTotal_pages());
+                    return result;
+                })
+                .map(ReviewsResult::getResults)
+                .flatMap(Observable::from)
+                .map(reviewBean -> {
+                    reviewBean.setMovie_id(id);
+                    return reviewBean;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(video -> main.addData(video), throwable -> {
+                    main.ShowToast("网络连接超时");
+                    main.setRefresh(false);
+                    Logger.d(throwable.getMessage());
+                    main.loadMore(false);
+                }, () -> {
+                    Logger.d("Success");
+                    main.setRefresh(false);
+                    main.loadMore(false);
+                });
+    }
+
+    private void dealMovies(Observable<ApiBean> observable) {
         observable.subscribeOn(Schedulers.io())
-                .map(map->(List<Map<String, Object>>) map.get("results"))
+                .map(result -> {
+                    main.setPage(result.getPage());
+                    main.setTotalPage(result.getTotal_pages());
+                    return result;
+                })
+                .map(ApiBean::getResults)
                 .flatMap(Observable::from)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(map ->main.addData(map), throwable ->
-                {
+                .subscribe(map -> main.addData(map), throwable -> {
                     main.ShowToast("网络连接超时");
+                    main.setRefresh(false);
                     Logger.d(throwable.getMessage());
-                }, ()->Logger.d("Success"));
-        //                .map( data ->{
-//                    List<Map<String,Object>> list=new ArrayList<>();
-//                    if (data!=null&&data.get("list")!=null){
-//                        list= (List<Map<String, Object>>) data.get("list");
-//                    }
-//                    return list;
-//                })
-//                .flatMap(Observable::from)
-//                .map(listBean -> {
-//                    String s="";
-//                    if (listBean.get("dt_txt")!=null)
-//                        s+=listBean.get("dt_txt").toString()+"\n";
-//                    List<Map<String,Object>> weather = (List<Map<String, Object>>) listBean.get("weather");
-//                    if (weather!=null)
-//                        s+="weather:"+weather.get(0).get("main");
-//                    Map<String,Object> main = (Map<String, Object>) listBean.get("main");
-//                    if (main!=null){
-//                        s+=" temp:"+main.get("temp")+", min" +main.get("temp_min")+ ", max"+main.get("temp_max");
-//                    }
-//                    return s;
-//                })
-//                .subscribe(
-//                        s -> {
-//                            arrayData.add(s);
-//                            arrayAdapter.notifyDataSetChanged();
-//                        },
-//                        throwable -> Logger.d(throwable.getMessage()),
-//                        ()-> Logger.d("Success"));
-
+                    main.loadMore(false);
+                }, () -> {
+                    Logger.d("Success");
+                    main.setRefresh(false);
+                    main.loadMore(false);
+                });
     }
 
-    public static <T>T createRetrofitService(final Class<T> service) {
+    public static <T> T createRetrofitService(final Class<T> service) {
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder builder = new OkHttpClient.Builder()

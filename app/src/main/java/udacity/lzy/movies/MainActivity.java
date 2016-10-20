@@ -2,107 +2,72 @@ package udacity.lzy.movies;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.Toast;
 
-import java.util.Map;
+import udacity.lzy.movies.Bean.MovieBean;
+import udacity.lzy.movies.fragment.DetailFragment;
+import udacity.lzy.movies.fragment.MovieFragment;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import udacity.lzy.movies.Adapter.MainAdapter;
-import udacity.lzy.movies.ApiService.ApiHelper;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends AppCompatActivity implements iMainListener {
+    private boolean twoPanel = false;
+    private MovieFragment movieFragment;
+    private DetailFragment detailFragment;
 
-    @Bind(R.id.rv)
-    RecyclerView rv;
-    @Bind(R.id.spinner)
-    Spinner spinner;
-    int type=0;
-    private MainAdapter mainAdapter;
-    private ApiHelper apiHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
         initView();
     }
 
     private void initView() {
-
-//        LinearLayoutManager manager = new LinearLayoutManager(this);
-        GridLayoutManager manager = new GridLayoutManager(this, 2);
-        rv.setLayoutManager(manager);
-        mainAdapter = new MainAdapter(this);
-        apiHelper = new ApiHelper(this);
+        FragmentManager fm = getSupportFragmentManager();
+        if (findViewById(R.id.detail)!=null){
+            twoPanel=true;
+            if (detailFragment==null)
+                detailFragment=new DetailFragment();
+            fm.beginTransaction().addToBackStack(MovieFragment.TAG)
+                    .replace(R.id.detail,detailFragment)
+                    .commit();
+        }
+        if (movieFragment==null)
+            movieFragment=new MovieFragment();
+        movieFragment.setTwoPanel(twoPanel);
         setListener();
-        rv.setAdapter(mainAdapter);
-        String[] spinnerStrings=new String[]{"最受欢迎","评分最高"};
-        ArrayAdapter<String> spinnerAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,spinnerStrings);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                type=position;
-                apiHelper.loadData(type);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-//        DisplayMetrics dm = getResources().getDisplayMetrics();
-//        width = (dm.widthPixels - 32) / 2;
+        fm.beginTransaction().addToBackStack(MovieFragment.TAG)
+                .replace(R.id.movies,movieFragment)
+                .commit();
     }
 
     private void setListener() {
-        mainAdapter.setListener((position, view) -> {
-            Map<String, Object> map = mainAdapter.getItem(position);
-            Intent intent=new Intent(this,DetailActivity.class);
-            if (map.get("title") != null) {
-                intent.putExtra("poster_path", map.get("poster_path").toString());
-                intent.putExtra("overview",map.get("overview").toString());
-                intent.putExtra("title",map.get("title").toString());
-                intent.putExtra("release_date",map.get("release_date").toString());
-                intent.putExtra("vote_average",map.get("vote_average").toString());
+        movieFragment.setListener((position, view) -> {
+            MovieBean map = movieFragment.getItem(position);
+            if (twoPanel){
+                detailFragment.clearData();
+                detailFragment.replaceHeader(map);
+            }else {
+                Intent intent = new Intent(this, DetailActivity.class);
+
+                if (map != null) {
+                    intent.putExtra("id", map.getId());
+                    intent.putExtra("poster_path", map.getPoster_path());
+                    intent.putExtra("overview", map.getOverview());
+                    intent.putExtra("title", map.getTitle());
+                    intent.putExtra("release_date", map.getRelease_date());
+                    intent.putExtra("vote_average", map.getVote_average());
+                }
+                startActivity(intent);
             }
-            startActivity(intent);
         });
-        mainAdapter.setLongListener((position, view) -> {
-            Map<String, Object> map = mainAdapter.getItem(position);
-            if (map.get("title") != null) {
-                Toast.makeText(this, map.get("title").toString(), Toast.LENGTH_SHORT).show();
+        movieFragment.setLongListener((position, view) -> {
+            MovieBean map = movieFragment.getItem(position);
+            if (map != null) {
+                movieFragment.ShowToast(map.getTitle());
                 return true;
             }
             return false;
         });
     }
-
-
-    @Override
-    public void addData(Map<String, Object> map) {
-        mainAdapter.add(map);
-    }
-
-    @Override
-    public void clearData() {
-        mainAdapter.clear();
-    }
-
-    @Override
-    public void ShowToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
 }

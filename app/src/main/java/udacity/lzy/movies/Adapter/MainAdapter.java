@@ -10,17 +10,16 @@ import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import udacity.lzy.movies.Bean.MovieBean;
 import udacity.lzy.movies.R;
 
 // @author: lzy  time: 2016/10/17.
 
 
 public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
-    private List<Map<String,Object>> list;
+    private List<MovieBean> list;
 
     private OnItemClickListener listener;
     private OnItemLongClickListener longListener;
@@ -32,17 +31,26 @@ public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
         mContext=context;
         this.list = new ArrayList<>();
         DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
-        width = (dm.widthPixels-32)/2;
+        width = dm.widthPixels/2 - 16;
     }
 
-    public MainAdapter(Context context,List<Map<String,Object>> list) {
+    public MainAdapter(Context context,List<MovieBean> list) {
         mContext=context;
         this.list = list;
         DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
         width = (dm.widthPixels-32)/2;
     }
 
-    public void add(Map<String,Object> map){
+    public void setTwoPanel(boolean twoPanel) {
+        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
+        if (twoPanel) {
+            width = dm.widthPixels  / 4 -16;
+        }else {
+            width = dm.widthPixels  / 2 -16;
+        }
+    }
+
+    public void add(MovieBean map){
         list.add(map);
         notifyDataSetChanged();
     }
@@ -67,8 +75,8 @@ public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
 
-        Map<String, Object> map = list.get(position);
-        Picasso.with(mContext).load(BaseUri+map.get("poster_path").toString()).into(holder.image);
+        MovieBean map = list.get(position);
+        Picasso.with(mContext).load(BaseUri+map.getPoster_path()).into(holder.image);
 
         ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
         params.height=width*38/27;
@@ -83,14 +91,15 @@ public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
 //                holder.itemView.setLayoutParams(params);
 //            }
 //        });
-        holder.text.setText(map.get("title").toString());
+        holder.text.setText(map.getTitle());
     }
 
-    public Map<String, Object> getItem(int position){
+    public MovieBean getItem(int position){
         if (position<list.size())
             return list.get(position);
-        return new HashMap<>();
+        return new MovieBean();
     }
+
     @Override
     public int getItemCount() {
         return list.size();
