@@ -24,30 +24,21 @@ public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
     private OnItemClickListener listener;
     private OnItemLongClickListener longListener;
     private Context mContext;
-    private int width=0;
     private final String BaseUri="http://image.tmdb.org/t/p/w185";
+    private boolean twoPanel=false;
 
     public MainAdapter(Context context) {
         mContext=context;
         this.list = new ArrayList<>();
-        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
-        width = dm.widthPixels/2 - 16;
     }
 
     public MainAdapter(Context context,List<MovieBean> list) {
         mContext=context;
         this.list = list;
-        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
-        width = (dm.widthPixels-32)/2;
     }
 
     public void setTwoPanel(boolean twoPanel) {
-        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
-        if (twoPanel) {
-            width = dm.widthPixels  / 4 -16;
-        }else {
-            width = dm.widthPixels  / 2 -16;
-        }
+        this.twoPanel=twoPanel;
     }
 
     public void add(MovieBean map){
@@ -77,7 +68,13 @@ public class MainAdapter extends RecyclerView.Adapter<MyHolder> {
 
         MovieBean map = list.get(position);
         Picasso.with(mContext).load(BaseUri+map.getPoster_path()).into(holder.image);
-
+        DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
+        int width;
+        if (twoPanel) {
+            width = (dm.widthPixels-32)  / 6 ;
+        }else {
+            width = (dm.widthPixels-32)  / 2 ;
+        }
         ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
         params.height=width*38/27;
         holder.itemView.setLayoutParams(params);

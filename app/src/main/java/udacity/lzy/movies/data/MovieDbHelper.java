@@ -30,7 +30,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_MOVIE = "CREATE TABLE " + MovieBean.TABLE_NAME + "(" +
-                MovieBean.ID + " PRIMARY KEY," +
+                MovieBean.ID + " INTEGER PRIMARY KEY," +
                 MovieBean.POSTER_PATH + " TEXT NOT NULL," +
                 MovieBean.ADULT + " BOOLEAN DEFAULT FALSE," +
                 MovieBean.OVERVIEW + " TEXT NOT NULL," +

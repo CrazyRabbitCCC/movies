@@ -12,12 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import udacity.lzy.movies.Adapter.DetailAdapter;
+import udacity.lzy.movies.Adapter.DividerItemDecoration;
 import udacity.lzy.movies.ApiService.ApiHelper;
 import udacity.lzy.movies.Bean.MovieBean;
 import udacity.lzy.movies.Bean.ReviewBean;
@@ -45,6 +47,10 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
     private MovieBean movie;
     private boolean isCollecting=true;
     private boolean collected=false;
+    public static final int STATE_CHANGED=0xF9;
+    public static final int STATE_NOT_CHANGE=0xfa;
+    private boolean first =true;
+    private boolean state=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,16 +82,8 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
 
         Bundle bundle = intent.getExtras();
         movie = (MovieBean) bundle.getSerializable("movie");
-//        int id = intent.getIntExtra("id", 0);
-//        movie.setId(intent.getIntExtra("id", 0));
-//        movie.setPoster_path(intent.getStringExtra("poster_path"));
-//        movie.setOverview(intent.getStringExtra("overview"));
-//        movie.setTitle(intent.getStringExtra("title"));
-//        movie.setRelease_date(intent.getStringExtra("release_date"));
-//        movie.setVote_average(intent.getDoubleExtra("vote_average", 0));
 
         if (movie!=null&&!TextUtils.isEmpty(movie.getTitle())) {
-//            toolbar.setTitle(title_text);
             toolbarLayout.setTitle(movie.getTitle());
         }
         setSupportActionBar(toolbar);
@@ -94,12 +92,13 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
         if (!TextUtils.isEmpty(movie.getPoster_path()))
             Picasso.with(DetailActivity.this).load(baseUri + movie.getPoster_path()).into(imageTop);
         toolbar.setNavigationIcon(R.drawable.ic_back);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
 //
         detailAdapter = new DetailAdapter(this,movie);
         final LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(manager);
+        rv.addItemDecoration(new DividerItemDecoration(getActivity(),LinearLayoutManager.VERTICAL));
 
         rv.setAdapter(detailAdapter);
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -137,9 +136,13 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
         detailAdapter.clear();
     }
 
+    private static Toast toast;
     @Override
     public void ShowToast(String msg) {
-
+        if (toast==null)
+            toast=Toast.makeText(getActivity(),msg,Toast.LENGTH_SHORT);
+        else toast.setText(msg);
+        toast.show();
     }
 
     @Override
@@ -162,6 +165,10 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
 
     @Override
     public void setCollect(boolean flag) {
+        if (first){
+            first=false;
+            state=flag;
+        }
         isCollecting=false;
         collected=flag;
         if (collected)
@@ -183,5 +190,14 @@ public class DetailActivity extends AppCompatActivity implements iMainListener {
         }else {
             isLoading = false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (state==collected)
+            setResult(STATE_NOT_CHANGE);
+        else
+            setResult(STATE_CHANGED);
+        super.onBackPressed();
     }
 }

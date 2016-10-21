@@ -56,6 +56,7 @@ public class MovieFragment extends Fragment implements iMainListener {
     private boolean isLoading = true;
     private int page = 1;
     private int totalPage = 1;
+    private int row=2;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,7 +83,9 @@ public class MovieFragment extends Fragment implements iMainListener {
 
 
 //        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
+        if (twoPanel)
+            row=3;
+        GridLayoutManager manager = new GridLayoutManager(getActivity(), row);
         rv.setLayoutManager(manager);
         mainAdapter = new MainAdapter(getActivity());
         mainAdapter.setTwoPanel(twoPanel);
@@ -99,8 +102,8 @@ public class MovieFragment extends Fragment implements iMainListener {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 type = position;
-                refresh.setRefreshing(true);
-                apiHelper.loadMovies(type);
+                loadData();
+
             }
 
             @Override
@@ -110,10 +113,7 @@ public class MovieFragment extends Fragment implements iMainListener {
         });
 
         refresh.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.GRAY);
-        refresh.setOnRefreshListener(() -> {
-            refresh.setRefreshing(true);
-            apiHelper.loadMovies(type);
-        });
+        refresh.setOnRefreshListener(this::loadData);
 
 
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -131,6 +131,15 @@ public class MovieFragment extends Fragment implements iMainListener {
         });
 //        DisplayMetrics dm = getResources().getDisplayMetrics();
 //        width = (dm.widthPixels - 32) / 2;
+    }
+
+    public void loadData() {
+        refresh.setRefreshing(true);
+        apiHelper.loadMovies(type);
+    }
+
+    public int getType() {
+        return type;
     }
 
     @Override

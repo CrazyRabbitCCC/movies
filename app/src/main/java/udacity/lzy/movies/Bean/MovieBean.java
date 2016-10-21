@@ -193,5 +193,4 @@ public  class MovieBean implements Serializable {
         values.put(MovieBean.GENRE_IDS,getGenreIds());
         return values;
     }
-
 }

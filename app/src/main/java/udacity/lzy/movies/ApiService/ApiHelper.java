@@ -19,7 +19,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import udacity.lzy.movies.Bean.ApiBean;
 import udacity.lzy.movies.Bean.MovieBean;
-import udacity.lzy.movies.Bean.ReviewsResult;
 import udacity.lzy.movies.Bean.VideosResult;
 import udacity.lzy.movies.iMainListener;
 
@@ -33,7 +32,7 @@ public class ApiHelper {
         movieApi = createRetrofitService(MovieApi.class);
     }
 
-    public static final String API_KEY = " ";
+    public static final String API_KEY = "key";
     public static final String BASE_CONTENT_URI = "content://udacity.lzy.movies.data.provider/movies";
 
     public void loadMovies(int type) {
@@ -58,7 +57,8 @@ public class ApiHelper {
     public void getVideos(int id) {
         movieApi.getVideos(id, API_KEY)
                 .subscribeOn(Schedulers.io())
-                .map(VideosResult::getResults)
+                .map(
+                        VideosResult::getResults)
                 .flatMap(Observable::from)
                 .map(videoBean -> {
                     videoBean.setMovie_id(id);
@@ -80,9 +80,9 @@ public class ApiHelper {
                 .map(result -> {
                     main.setPage(result.getPage());
                     main.setTotalPage(result.getTotal_pages());
-                    return result;
+                    return result.getResults();
+
                 })
-                .map(ReviewsResult::getResults)
                 .flatMap(Observable::from)
                 .map(reviewBean -> {
                     reviewBean.setMovie_id(id);
@@ -173,6 +173,8 @@ public class ApiHelper {
                         movie.setVideo(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(MovieBean.VIDEO))));
                         movie.setVote_average(cursor.getDouble(cursor.getColumnIndex(MovieBean.VOTE_AVERAGE)));
                         movie.setGenre_ids(cursor.getString(cursor.getColumnIndex(MovieBean.GENRE_IDS)));
+                        movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieBean.TITLE)));
+                        movie.setBackdrop_path(cursor.getString(cursor.getColumnIndex(MovieBean.BACKDROP_PATH)));
                         list.add(movie);
                     }
                     cursor.close();
@@ -197,7 +199,7 @@ public class ApiHelper {
                 .subscribeOn(Schedulers.io())
                 .map(uri-> main.getActivity().getContentResolver().insert(uri, movie.getContentValues()))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(collected -> main.setCollect(true), throwable -> {
+                .subscribe(this::getCollectMovies, throwable -> {
                     main.ShowToast("收藏失败");
                     main.setRefresh(false);
                     Logger.d(throwable.getMessage());

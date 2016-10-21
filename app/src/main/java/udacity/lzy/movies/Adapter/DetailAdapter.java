@@ -100,6 +100,10 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailHolder> {
             View headerView = LayoutInflater.from(parent.getContext()).inflate(R.layout.detail_header, parent, false);
             return new DetailHeader(headerView, listener, longListener);
         }
+        if (viewType==2){
+            View videoView= LayoutInflater.from(parent.getContext()).inflate(R.layout.detail_video, parent, false);
+            return new DetailHolder(videoView, listener, longListener);
+        }
         if (viewType == 4) {
             View footView = LayoutInflater.from(parent.getContext()).inflate(R.layout.detail_foot, parent, false);
             return new DetailFoot(footView, listener, longListener);
@@ -173,6 +177,13 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailHolder> {
         return videos.size() + reviews.size() + 2;
     }
 
+    public Object getItem(int position){
+        if (position==0||position==getItemCount())
+            return null;
+        if (position<videos.size()+1)
+            return videos.get(position-1);
+        else return reviews.get(position-videos.size()-1);
+    }
     @Override
     public int getItemViewType(int position) {
         if (position - 1 < 0)
